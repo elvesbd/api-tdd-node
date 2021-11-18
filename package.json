@@ -2,17 +2,6 @@
   "name": "api-node-tdd",
   "version": "1.0.0",
   "main": "index.js",
-  "lint-staged": {
-    "*.js": [
-      "standard --fix",
-      "git add"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "repository": "https://github.com/elvesbd/api-tdd-node.git",
   "author": "elvesbd <elvesbd@yahoo.com>",
   "license": "MIT",
