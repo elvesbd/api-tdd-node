@@ -2,6 +2,12 @@
   "name": "api-node-tdd",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "standard": {
+    "env": ["jest"]
+  },
   "repository": "https://github.com/elvesbd/api-tdd-node.git",
   "author": "elvesbd <elvesbd@yahoo.com>",
   "license": "MIT",
@@ -11,8 +17,8 @@
     "lint-staged": "^12.0.3",
     "standard": "^16.0.4"
   },
-  "dependencies": {},
-  "scripts": {
-    "test": "jest"
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.13"
   }
 }
