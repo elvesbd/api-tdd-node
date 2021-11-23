@@ -1,8 +1,19 @@
 const LoginRouter = require('./login-router')
 const MissingParamError = require('../helpers/missing-param-error')
 const UnauthorizedError = require('../helpers/unauthorized-error')
+const ServerError = require('../helpers/server-error')
 
 const makeSut = () => {
+  const authUseCaseMock = mockAuthUseCase()
+  authUseCaseMock.accessToken = 'valid-token'
+  const sut = new LoginRouter(authUseCaseMock)
+  return {
+    sut,
+    authUseCaseMock
+  }
+}
+
+const mockAuthUseCase = () => {
   class AuthUseCaseMock {
     auth (email, password) {
       this.email = email
@@ -10,13 +21,16 @@ const makeSut = () => {
       return this.accessToken
     }
   }
-  const authUseCaseMock = new AuthUseCaseMock()
-  authUseCaseMock.accessToken = 'valid-token'
-  const sut = new LoginRouter(authUseCaseMock)
-  return {
-    sut,
-    authUseCaseMock
+  return new AuthUseCaseMock()
+}
+
+const mockAuthUseCaseWithError = () => {
+  class AuthUseCaseMock {
+    auth () {
+      throw new Error()
+    }
   }
+  return new AuthUseCaseMock()
 }
 
 describe('Login router', () => {
@@ -48,6 +62,7 @@ describe('Login router', () => {
     const { sut } = makeSut()
     const httpResponse = sut.route(undefined)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if httpRequest has no body', () => {
@@ -55,6 +70,7 @@ describe('Login router', () => {
     const httpRequest = { undefined }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should call AuthUseCase with correct params', () => {
@@ -107,6 +123,7 @@ describe('Login router', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if no AuthUseCase has no auth method', () => {
@@ -114,6 +131,21 @@ describe('Login router', () => {
     const httpRequest = {
       body: {
         email: 'ant_email@email.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if no AuthUseCase throws', () => {
+    const authUseCaseMock = mockAuthUseCaseWithError()
+    authUseCaseMock.accessToken = 'valid-token'
+    const sut = new LoginRouter(authUseCaseMock)
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
         password: 'any_password'
       }
     }
