@@ -167,7 +167,7 @@ describe('Login router', () => {
     expect(httpResponse.statusCode).toBe(500)
   })
 
-  test('Should return 400 if an invalid email is provided  ', async () => {
+  test('Should return 400 if an invalid email is provided', async () => {
     const { sut, emailValidatorMock } = makeSut()
     emailValidatorMock.isEmailValid = false
     const httpRequest = {
@@ -179,5 +179,33 @@ describe('Login router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+  })
+
+  test('Should return 500 if no EmailValidator is provided', async () => {
+    const authUseCaseMock = mockAuthUseCase()
+    const sut = new LoginRouter(authUseCaseMock)
+    const httpRequest = {
+      body: {
+        email: 'ant_email@email.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if no EmailValidator has no isValid method', async () => {
+    const authUseCaseMock = mockAuthUseCase()
+    const sut = new LoginRouter(authUseCaseMock, {})
+    const httpRequest = {
+      body: {
+        email: 'ant_email@email.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
