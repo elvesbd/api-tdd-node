@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --silent --colors",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --silent",
+    "test": "jest --silent --colors --passWithNoTests",
+    "test:unit": "yarn test -- --watch",
+    "test:staged": "yarn test -- --findRelatedTests",
     "test:ci": "jest --coverage"
   },
   "standard": {
