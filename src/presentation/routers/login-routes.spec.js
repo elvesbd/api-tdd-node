@@ -47,6 +47,15 @@ const mockAuthUseCaseWithError = () => {
   return new AuthUseCaseMock()
 }
 
+const mockEmailValidatorWithError = () => {
+  class EmailValidatorMock {
+    isValid () {
+      throw new Error()
+    }
+  }
+  return new EmailValidatorMock()
+}
+
 describe('Login router', () => {
   test('Should return 400 if no email is provided  ', async () => {
     const { sut } = makeSut()
@@ -207,5 +216,19 @@ describe('Login router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if no EmailValidator throws', async () => {
+    const authUseCaseMock = mockAuthUseCase()
+    const emailValidatorMock = mockEmailValidatorWithError()
+    const sut = new LoginRouter(authUseCaseMock, emailValidatorMock)
+    const httpRequest = {
+      body: {
+        email: 'any_email@email.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
   })
 })
