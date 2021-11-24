@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --silent --colors --passWithNoTests",
-    "test:unit": "yarn test -- --watch",
+    "test:unit": "yarn test -- --watch -c jest-unit-config.js",
+    "test:integration": "yarn test -- --watch -c jest-integration-config.js",
     "test:staged": "yarn test -- --findRelatedTests",
     "test:ci": "jest --coverage"
   },
