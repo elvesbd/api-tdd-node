@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll",
-    "test:staged": "jest --passWithNoTests"
+    "test": "jest --watchAll --silent --colors",
+    "test:staged": "jest --passWithNoTests --findRelatedTests --silent"
   },
   "standard": {
     "env": ["jest"]
