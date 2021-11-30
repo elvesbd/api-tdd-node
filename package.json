@@ -10,7 +10,9 @@
     "test:ci": "jest --coverage"
   },
   "standard": {
-    "env": ["jest"]
+    "env": [
+      "jest"
+    ]
   },
   "repository": "https://github.com/elvesbd/api-tdd-node.git",
   "author": "elvesbd <elvesbd@yahoo.com>",
@@ -23,6 +25,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "mongoose": "^6.0.13"
+    "mongoose": "^6.0.13",
+    "validator": "^13.7.0"
   }
 }
