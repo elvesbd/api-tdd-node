@@ -1,9 +1,12 @@
 const LoginRouter = require('./login-router')
 const {
   MissingParamError,
-  UnauthorizedError,
-  ServerError,
   InvalidParamError
+} = require('../../utils/errors')
+
+const {
+  UnauthorizedError,
+  ServerError
 } = require('../errors')
 
 const makeSut = () => {
