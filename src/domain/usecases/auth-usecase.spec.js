@@ -1,6 +1,18 @@
 const { MissingParamError } = require('../../utils/errors')
 const AuthUseCase = require('./auth-usecase')
 
+const makeTokenGenerator = () => {
+  class TokenGeneratorMock {
+    async generate (userId) {
+      this.userId = userId
+      return this.accessToken
+    }
+  }
+  const tokenGeneratorMock = new TokenGeneratorMock()
+  tokenGeneratorMock.accessToken = 1
+  return tokenGeneratorMock
+}
+
 const makeEncrypted = () => {
   class EncryptedMock {
     async compare (password, hashPassword) {
@@ -23,6 +35,7 @@ const makeLoadUserByEmailRepository = () => {
   }
   const loadUserByEmailRepositoryMock = new LoadUserByEmailRepositoryMock()
   loadUserByEmailRepositoryMock.user = {
+    id: 1,
     password: 'hashed_password'
   }
   return loadUserByEmailRepositoryMock
@@ -31,12 +44,14 @@ const makeLoadUserByEmailRepository = () => {
 const makeSut = () => {
   const encryptedMock = makeEncrypted()
   const loadUserByEmailRepositoryMock = makeLoadUserByEmailRepository()
+  const tokenGeneratorMock = makeTokenGenerator()
 
-  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encryptedMock)
+  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encryptedMock, tokenGeneratorMock)
   return {
     sut,
     loadUserByEmailRepositoryMock,
-    encryptedMock
+    encryptedMock,
+    tokenGeneratorMock
   }
 }
 
@@ -90,5 +105,11 @@ describe('Auth UseCase', () => {
     await sut.auth('valid_email@gmail.com', 'any_password')
     expect(encryptedMock.password).toBe('any_password')
     expect(encryptedMock.hashPassword).toBe(loadUserByEmailRepositoryMock.user.password)
+  })
+
+  test('should call token generator with correct user id', async () => {
+    const { sut, loadUserByEmailRepositoryMock, tokenGeneratorMock } = makeSut()
+    await sut.auth('valid_email@gmail.com', 'valid_password')
+    expect(tokenGeneratorMock.userId).toBe(loadUserByEmailRepositoryMock.user.id)
   })
 })
