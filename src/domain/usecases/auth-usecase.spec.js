@@ -177,6 +177,7 @@ describe('Auth UseCase', () => {
     const invalid = {}
     const loadUserByEmailRepository = makeLoadUserByEmailRepository()
     const encrypted = makeEncrypted()
+    const tokenGenerator = makeTokenGenerator()
 
     const suts = [].concat(
       new AuthUseCase(),
@@ -203,6 +204,17 @@ describe('Auth UseCase', () => {
         loadUserByEmailRepository,
         encrypted,
         tokenGenerator: invalid
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypted,
+        tokenGenerator
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypted,
+        tokenGenerator,
+        updatedAccessTokenRepository: invalid
       })
     )
     for (const sut of suts) {
