@@ -2,6 +2,14 @@ const { MissingParamError } = require('../../utils/errors')
 const AuthUseCase = require('./auth-usecase')
 
 const makeSut = () => {
+  class EncryptedMock {
+    async compare (password, hashPassword) {
+      this.password = password
+      this.hashPassword = hashPassword
+    }
+  }
+  const encryptedMock = new EncryptedMock()
+
   class LoadUserByEmailRepositoryMock {
     async load (email) {
       this.email = email
@@ -9,11 +17,14 @@ const makeSut = () => {
     }
   }
   const loadUserByEmailRepositoryMock = new LoadUserByEmailRepositoryMock()
-  loadUserByEmailRepositoryMock.user = {}
-  const sut = new AuthUseCase(loadUserByEmailRepositoryMock)
+  loadUserByEmailRepositoryMock.user = {
+    password: 'hashed_password'
+  }
+  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encryptedMock)
   return {
     sut,
-    loadUserByEmailRepositoryMock
+    loadUserByEmailRepositoryMock,
+    encryptedMock
   }
 }
 
@@ -59,5 +70,12 @@ describe('Auth UseCase', () => {
     const { sut } = makeSut()
     const accessToken = await sut.auth('valid_email@gmail.com', 'invalid_password')
     expect(accessToken).toBe(null)
+  })
+
+  test('should call encrypted with correct values', async () => {
+    const { sut, loadUserByEmailRepositoryMock, encryptedMock } = makeSut()
+    await sut.auth('valid_email@gmail.com', 'any_password')
+    expect(encryptedMock.password).toBe('any_password')
+    expect(encryptedMock.hashPassword).toBe(loadUserByEmailRepositoryMock.user.password)
   })
 })
