@@ -20,4 +20,11 @@ describe('Encrypter', () => {
     const isValid = await sut.compare('any_value', 'any_hash')
     expect(isValid).toBe(false)
   })
+
+  test('should call bcrypt if correct values', async () => {
+    const sut = new Encrypter()
+    await sut.compare('any_value', 'any_hash')
+    expect(bcrypt.value).toBe('any_value')
+    expect(bcrypt.hash).toBe('any_hash')
+  })
 })
